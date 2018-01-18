@@ -67,7 +67,7 @@ alias -- -="cd -"
 # Shortcuts
 alias downloads="cd ~/Downloads"
 alias desktop="cd ~/Desktop"
-alias projects="cd ~/Documents/projects"
+alias codef="cd ~/Desktop/Code"
 alias dotfiles="cd ~/dotfiles"
 alias g="git"
 
@@ -103,10 +103,6 @@ alias ls="command ls ${colorflag}"
 #
 # MISC
 #
-
-# Correct failed commands using `pls`
-eval $(thefuck --alias pls)
-
 
 # Add tab completion for many Bash commands
 brewdir=`brew --prefix`

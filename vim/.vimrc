@@ -4,9 +4,7 @@ execute pathogen#infect()
 " Work with crontabs
 au BufNewFile,BufRead crontab.* set nobackup | set nowritebackup
 
-" TODOS {{{
-" configure vim-fugitive
-" configure repeat
+" TODOS {{{ " configure vim-fugitive " configure repeat
 " configure leader
 " https://github.com/sjl/gundo.vim.git
 " https://github.com/Xuyuanp/nerdtree-git-plugin
@@ -52,22 +50,22 @@ let g:ctrlp_show_hidden = 1
 let g:gitgutter_map_keys = 0
 " }}}
 
-" Syntastic {{{
+" " Syntastic {{{
 
-" Set up for JS tools
-let g:syntastic_javascript_checkers = ['flow', 'eslint']
+" " Set up for JS tools
+" let g:syntastic_javascript_checkers = ['flow', 'eslint']
 
-" Recommended settings
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
+" " Recommended settings
+" set statusline+=%#warningmsg#
+" set statusline+=%{SyntasticStatuslineFlag()}
+" set statusline+=%*
 
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 0
-let g:syntastic_check_on_wq = 0
-nmap + :SyntasticCheck<CR>
-" }}}
+" let g:syntastic_always_populate_loc_list = 1
+" let g:syntastic_auto_loc_list = 1
+" let g:syntastic_check_on_open = 0
+" let g:syntastic_check_on_wq = 0
+" nmap + :SyntasticCheck<CR>
+" " }}}
 
 " Colors {{{
 " enable syntax processing
@@ -197,5 +195,4 @@ let g:javascript_plugin_flow = 1
 let g:flow#enable = 0
 " }}}
 
-" vim:foldmethod=marker:foldlevel=0
 
