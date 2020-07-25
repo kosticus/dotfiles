@@ -1,49 +1,119 @@
 # dotfiles
 
-This repo manages most of my dotfiles. GNU `stow` is used to manage the symlinks and installation.
+<!-- vim-markdown-toc GFM -->
 
-These instructions assume you are on a mac (only tested on high sierra), have iterm2 installed, and have brew installed.
+* [Overview](#overview)
+* [Setting up](#setting-up)
+* [Tearing down](#tearing-down)
+* [Feature tour](#feature-tour)
+  * [Vim](#vim)
+  * [Tmux](#tmux)
+  * [Bash](#bash)
+  * [Scripts](#scripts)
+  * [Git](#git)
+    * [Working with git submodules](#working-with-git-submodules)
+    * [Install additional plugins with:](#install-additional-plugins-with)
+    * [Update all submodules with:](#update-all-submodules-with)
+    * [Update one submodule](#update-one-submodule)
 
-Gitconfig strategy is borrowed from: [nicksp's dotfiles](https://github.com/nicksp/dotfiles).
+<!-- vim-markdown-toc -->
 
 
-To get vim-fugitive to work you may need to run the following after cloning.
+## Overview
+- Repo primarily concerns itself with vim, bash, git, and tmux on Mac OSX using iTerm2
+- GNU `stow` is used to manage the symlinks and installation.
+- Packages can be installed using `install.sh`, which should work on mac or linux
+- Other dependencies, such as vim plugins, are managed using git submodules
+
+
+## Setting up
+1. Run the following to set up symlinks:
 ```bash
-vim -u NONE -c "helptags vim-fugitive/doc" -c q
-```
-
-
-### ~/.gitconfig.local
-If the ~/.gitconfig.local file exists, it will be automatically included after the configurations from ~/.gitconfig, thus, allowing its content to overwrite or add to the existing git configurations.
-
-Note: Use ~/.gitconfig.local to store sensitive information such as the git user credentials, e.g.:
-```
-[user]
-  name = Nick Plekhanov
-  email = nick@example.com
-```
-
-## Replication
-```bash
-# clone repo and all submodules to home directory
+# Clone repo and all submodules
 git clone --recursive https://github.com/Nathan-Schwartz/dotfiles.git ~/dotfiles
 
 cd ~/dotfiles
 
-brew install stow
+# Install stow however you like.
+# The install script (./scripts/install.sh) will install stow but also many other things.
 
-# Use configurations, this can be done individually by folder.
-stow vim bash git iterm
+# Set up symlinks
+stow vim bash git iterm tmux
 ```
 
-### Scripts
-- install-brew.sh: install brew, update brew, upgrade all packages, install some packages.
-- install-npm.sh: install n and use it to get latest lts release. Then install some global packages.
-- configure-macosx.sh: Set some OS defaults.
-- uninstall-node.sh: Works, but don't use it. Checked in for my convenience.
+2. To identify yourself with git, create a `~/.gitconfig.local` with the following structure:
+```
+[user]
+  name = Replace Me
+  email = replaceme@example.com
+```
 
-### Teardown
+
+## Tearing down
+To disable configs without removing the repo
 ```bash
 # remove symlinks
-stow --delete vim bash git iterm
+stow --delete vim bash git iterm tmux
 ```
+
+
+## Feature tour
+
+### Vim
+- File Navigation
+  - Fuzzy file search with CtrlP (using ag)
+  - Project search with Ack.vim (using ag)
+  - Browse directories with NERDTree
+- Integrations
+  - linter, typecheck, autocomplete, and autofix support with ALE
+  - Tmux panes and vim windows share key binding (vim-tmux-navigator)
+- Editing
+  - Multi-cursor editing with vim-multi-cursor
+  - camelcase support, persistent undo, repeat, vim-surround, and more
+- UI
+  - Quick access to MRU files & sessions on startup with vim-startify
+  - Solarized theme, lightline, polyglot syntax highlighting, inertia scroll
+
+
+### Tmux
+- Tmux and Tmate support for Mac and Linux
+- Can resurrect tmux sessions
+- Vim inspired key bindings
+- Solarized dark theme to match vim
+
+
+### Bash
+- aliases to quickly edit config files
+- sets readline to vi mode and shows vi-mode in prompt.
+- To support computer specific configs, the first thing `.bash_profile` will do is source `~/.env`, and the last thing is to source `~/.bash_profile.local`
+
+
+### Scripts
+- install.sh: idempotent script which will:
+  - optionally install any available OSX updates
+  - install (or update if already installed): brew, n, Node.js LTS, global npm packages, pip packages, and brew formulae
+- configure-macosx.sh: Set some OS defaults (inpsired by [mathiasbynens dotfiles](https://github.com/mathiasbynens/dotfiles/blob/main/.macos))
+
+### Git
+- My approach to .gitconfig is inspired by [nicksp's dotfiles](https://github.com/nicksp/dotfiles).
+- I have a global gitignore and various git aliases
+
+#### Working with git submodules
+Documented here for my convenience.
+
+#### Install additional plugins with:
+```bash
+git submodule add -f https://github.com/foo/bar.git ./vim/.vim/bundle/bar
+```
+
+#### Update all submodules with:
+```bash
+git submodule foreach --recursive git pull --rebase origin master
+```
+
+#### Update one submodule
+```bash
+cd mySubmodule
+git pull --rebase origin master
+```
+
