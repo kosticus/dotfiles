@@ -17,7 +17,9 @@ Convert the current conversation into atomic PKM artifacts with compound extensi
 
 The target directory is: $ARGUMENTS
 
-Verify it exists. If empty or omitted, ask the user.
+Default: `~/pkm/projects/`
+
+If `$ARGUMENTS` is empty or omitted, use the default. Verify the resolved directory exists.
 
 ## 2. Analyze conversation with ref bias
 
