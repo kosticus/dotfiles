@@ -8,7 +8,6 @@
   },
   "includeGitInstructions": true,
   "permissions": {
-    "defaultMode": "default",
     "allow": [
       "Bash(which *)",
       "Bash(pwd)",
@@ -25,8 +24,10 @@
       "Bash(ls *)",
       "Bash(stat *)",
       "Bash(cat ~/.claude/references/*)"
-    ]
+    ],
+    "defaultMode": "default"
   },
+  "model": "claude-opus-4-6",
   "hooks": {
     "PostToolUse": [
       {
@@ -40,17 +41,20 @@
       }
     ]
   },
-  "mcpServers": {
-    "qmd": {
-      "command": "bash",
-      "args": ["-c", "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/qmd-mcp.sh"]
-    }
-  },
   "statusLine": {
     "type": "command",
     "command": "bash /Users/kimberlykost/.claude/statusline-command.sh"
   },
-  "model": "claude-opus-4-6",
+  "outputStyle": "explanatory",
+  "syntaxHighlightingDisabled": false,
   "effortLevel": "high",
-  "outputStyle": "explanatory"
+  "mcpServers": {
+    "qmd": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/qmd-mcp.sh"
+      ]
+    }
+  }
 }
