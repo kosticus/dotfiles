@@ -19,7 +19,10 @@ The target directory is: $ARGUMENTS
 
 Default: `~/pkm/projects/`
 
-If `$ARGUMENTS` is empty or omitted, use the default. Verify the resolved directory exists.
+If `$ARGUMENTS` is empty or omitted, use the default. Resolve the directory:
+- If it exists as an absolute path or relative to the current directory, use it directly.
+- If not found, check `~/pkm/projects/$ARGUMENTS`.
+- If still not found, abort with an error listing the paths that were checked.
 
 ## 2. Analyze conversation with ref bias
 

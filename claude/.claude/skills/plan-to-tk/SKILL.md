@@ -34,7 +34,10 @@ If this contract cannot be met, the skill MUST fail loudly rather than produce u
 
 Before doing any work, check for conditions that would invalidate ticket creation:
 
-1. **Plan file**: Verify the file exists and is readable at `$0`. Abort if not found.
+1. **Plan file**: Resolve `$0` to an existing file:
+   - If `$0` is an absolute path or exists relative to the current directory, use it directly.
+   - If not found, search `~/pkm/projects/` for a file matching the basename of `$0`.
+   - If still not found, abort with an error listing the paths that were checked.
 
 2. **Overlapping tickets**: Check for existing tickets that may conflict:
    ```bash

@@ -69,6 +69,13 @@ The four types:
 
 Most sessions contain ref-shaped material (facts, observations) tangled inside reasoning. Actively decompose content to extract refs — more knowledge lands in the cheapest-to-verify tier, and synths get shorter because they cite refs instead of restating facts.
 
+### PKM Source Freshness
+
+PKM sources go stale as work progresses. Two rules to prevent downstream artifacts (plans, tickets) from describing already-completed work:
+
+1. **On ticket close**: When closing a ticket whose work was described in a PKM source document, update or annotate that source to reflect completion (e.g., marking a section "done per sos-XXX"). This keeps sources honest for any future use.
+2. **On plan generation**: When generating plans from PKM sources, always cross-reference `tk closed` and the current codebase state before describing work items. Treat PKM sources as aspirational scope, not current state.
+
 ### qmd (Semantic Search)
 
 PKM directories are indexed by [qmd](https://github.com/tobi/qmd) for keyword and semantic search across notes. A PostToolUse hook automatically updates the qmd index when compound-extension files are written.
