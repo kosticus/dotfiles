@@ -163,7 +163,8 @@ function! OpenQuickFixInTabs() abort
     " Lines without files will appear as bufnr=0
     if l:bufnr > 0
       " Get absolute path for each buffer
-      let l:buffer_numbers[l:bufnr] = trim(fnameescape(expand('#' . l:bufnr . ':p')). ' ')
+      let l:buffer_numbers[l:bufnr] = trim(fnameescape(expand('#' . l:bufnr . ':p')). ' 
+')
     endif
   endfor
 
@@ -606,7 +607,14 @@ augroup RemoveTrailingWhitespaceGroup
   autocmd BufWritePre * %s/\s\+$//e
 augroup END
 
+<<<<<<< HEAD
+=======
 " Indentation settings for using 4 spaces instead of tabs.
 set softtabstop=2
 set shiftwidth=2
 set expandtab
+<<<<<<< HEAD
+=======
+>>>>>>> c0e754638e690563823ce8ca98c486d4ea706342
+
+>>>>>>> cb813245d0ddad43f182384b646950ce45148210
