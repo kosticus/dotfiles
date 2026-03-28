@@ -90,10 +90,6 @@ function brew_installs() {
   log "Updating Brew"
   brew update
 
-  # Upgrade any already-installed formulae.
-  log "Upgrading Brew"
-  brew upgrade
-
   log "Installing Brew packages"
   brew install git python3 pipx bash stow vim tree mise bash-completion rsync coreutils
 
@@ -182,12 +178,13 @@ function upgrade_dependencies() {
   mise upgrade
 
   log "Updating git submodules"
-  git -C "$DOTFILES_DIR" submodule update --force --recursive --init --remote
+  git -C "$DOTFILES_DIR" submodule sync --recursive
+  git -C "$DOTFILES_DIR" submodule update --force --init --remote
 
   log "Symlinking vendor tools"
   mkdir -p "$HOME/.local/bin"
   ln -sf "$DOTFILES_DIR/vendor/ticket/ticket" "$HOME/.local/bin/tk"
-  for plugin in "$DOTFILES_DIR"/vendor/tk-plugins/ticket-*; do
+  for plugin in "$DOTFILES_DIR"/vendor/ticket/plugins/ticket-*; do
     [ -f "$plugin" ] && ln -sf "$plugin" "$HOME/.local/bin/$(basename "$plugin")"
   done
 

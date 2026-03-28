@@ -23,9 +23,10 @@
       "Bash(git log *)",
       "Bash(ls *)",
       "Bash(stat *)",
-      "Bash(cat ~/.claude/references/*)"
-    ],
-    "defaultMode": "default"
+      "Bash(cat ~/.claude/references/*)",
+      "Read(~/.claude/references/*)",
+      "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)"
+    ]
   },
   "model": "claude-opus-4-6",
   "hooks": {

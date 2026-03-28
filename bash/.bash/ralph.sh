@@ -20,7 +20,7 @@
 #
 # Task Lifecycle Within Ralph:
 #
-#   open + planned tag ──[tk start]──▸ in_progress ──[claude -p]──▸ ?
+#   open + planned tag ──[tk start --if=open]──▸ in_progress ──[claude -p]──▸ ?
 #                                                                   │
 #                                           ┌───────────────────────┤
 #                                           │                       │
@@ -32,7 +32,7 @@
 #                                                            (failed)
 #
 # Loop States:
-#   SELECT  ──▸ pick next task from tk ready -T planned (skip in_progress)
+#   SELECT  ──▸ pick next task from tk ready -T planned -s open
 #   CLAIM   ──▸ tk start (open → in_progress)
 #   EXECUTE ──▸ claude -p with task context
 #   EVAL    ──▸ check tk status: closed = completed, else = abandoned
@@ -93,13 +93,28 @@
 # TASK_TOO_LARGE  Task exceeds what one agent session can handle → partial
 #                 work or abandon. Mitigation: human decomposes before tagging.
 #
-# CONCURRENT_CLAIM  Ralph and an interactive /execute session claim the same
-#                 task. tk start has no guard against re-starting an in_progress
-#                 task, so both succeed and work on it simultaneously. Ralph
-#                 filters out in_progress tasks, but /execute does not — and
-#                 even with filtering, a race window exists between listing and
-#                 claiming. Mitigation: avoid running ralph while an interactive
-#                 session is executing planned tasks.
+# CONCURRENT_CLAIM  Mitigated, not eliminated. Three layers reduce the
+#                 window but none are airtight:
+#                 1. -s open on tk ready filters out in_progress tickets at
+#                    the source, so claimed tasks rarely appear in selection.
+#                 2. --if=open on tk start is a check-and-set: if the ticket
+#                    moved to in_progress between ready and start, the claim
+#                    fails and the loop picks the next task.
+#                 3. tk start's read-after-write detection: if two sessions
+#                    both pass --if=open within a configurable window (default
+#                    5 min), the later claimant detects the competing "Started
+#                    by" note and relinquishes.
+#                 Known gaps:
+#                 - RAW window is finite. A claim arriving after the window
+#                   expires won't detect the original — two sessions own it.
+#                 - Double relinquish: if two claimers arrive near-simultaneously,
+#                   both may see each other's note and both relinquish, leaving
+#                   the ticket in_progress with no actual owner.
+#                 - Claims prevent duplicate work, not conflicts. Even with
+#                   clean claims, plan-to-tk's contention deps are best-effort
+#                   — parallel tasks may still touch the same files.
+#                 Net effect: concurrent ralph + /execute is unlikely to
+#                 collide, but /tk-triage should audit for orphaned claims.
 #
 # =============================================================================
 
@@ -154,10 +169,10 @@ ralph() (
       break
     fi
 
-    # Get next planned task, filtering out in_progress (already claimed or failed)
+    # Get next open planned task (-s open filters at tk level, no grep needed)
     # tk ready output format: "<id>  [P<priority>][<status>] - <title>"
     local task_line
-    task_line=$(tk ready -T planned 2>/dev/null | grep -v '\[in_progress\]' | head -1) || true
+    task_line=$(tk ready -T planned -s open 2>/dev/null | head -1) || true
 
     if [ -z "$task_line" ]; then
       echo "No ready planned tasks."
@@ -170,7 +185,12 @@ ralph() (
     echo "=== $task_id ==="
 
     # --- CLAIM ---
-    tk start "$task_id"
+    # --if=open: fail if already claimed (check-and-set, prevents TOCTOU race)
+    # --by=ralph: attribution for triage
+    if ! tk start --if=open --by=ralph "$task_id"; then
+      echo "  skipped — claimed by another session"
+      continue
+    fi
 
     # --- EXECUTE ---
     local task_context

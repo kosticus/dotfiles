@@ -15,8 +15,7 @@ New vim plugins must be added as git submodules under `vim/.vim/bundle/` and are
 ### Vendor Directory
 
 `vendor/` contains third-party tools managed as git submodules or local scripts:
-- `vendor/ticket/` — git submodule for [tk](https://github.com/wedow/ticket), a bash-based task manager
-- `vendor/tk-plugins/` — custom tk plugins (`ticket-tag`, `ticket-untag`), symlinked into `~/.local/bin/` by `install.sh`
+- `vendor/ticket/` — git submodule for [tk](https://github.com/Nathan-Schwartz/ticket), a bash-based task manager
 
 ### Key Files
 
@@ -30,6 +29,10 @@ New vim plugins must be added as git submodules under `vim/.vim/bundle/` and are
 - `scripts/qmd-sync.sh` — Discovers PKM directories and registers them as qmd collections
 - `scripts/qmd-mcp.sh` — Wrapper that launches `qmd mcp` for the Claude MCP server integration
 - `scripts/generate-mocs.py` — Generates Maps of Content (`.index.md`) for PKM directories
+- `bash/.bash/ralph.sh` — Ralph autonomous executor (task-per-session loop backed by tk + claude CLI)
+- `tmux/.tmux/scripts/claude-status.sh` — Detects Claude Code state (working/waiting/idle) in a tmux pane
+- `tmux/.tmux/scripts/claude-dashboard.sh` — Interactive Claude session dashboard (status + window switcher)
+- `claude/.claude/statusline.sh` — Claude Code statusline (session info, context window, rate limits, cost)
 
 ### Override Pattern
 
@@ -142,6 +145,36 @@ Leader is `<Space>`. Plugins are loaded via Pathogen from `vim/.vim/bundle/`.
 - `gf` opens file in new tab (overridden default)
 - `j`/`k` navigate visual lines (respect wrapping)
 
+## Tmux
+
+Prefix is `Ctrl-Space`. Key bindings use vi-style navigation. Solarized dark theme matches vim.
+
+### Claude Integration
+
+The tmux status bar shows per-window Claude Code state via `claude-status.sh`:
+- `●` — Claude is working
+- `?` — Claude is waiting for input (approval prompt)
+- `○` — Claude is idle
+- (blank) — not a Claude pane
+
+`<prefix> W` opens the Claude session dashboard (`claude-dashboard.sh`) — a popup showing all windows with their Claude status, working directory, and git branch. Navigate with j/k, Enter to switch.
+
+### Bash Helpers
+
+- `tma` — start or resume the main tmux session
+- `tmk` — kill all tmux sessions
+- `tmc` / `tmclaude [name]` — open Claude Code in a named tmux window (defined in `bash/.bash/aliases.sh`). Works from inside or outside tmux, and from popups.
+
+### Key Bindings
+
+- `<prefix> Enter` — scratch terminal popup (80%, exits on shell exit)
+- `<prefix> W` — Claude session dashboard
+- `<prefix> w` — built-in window/session tree picker
+- `<prefix> Tab` — toggle to last active window
+- `<prefix> v` / `<prefix> s` — split vertical / horizontal
+- `Ctrl h/j/k/l` — navigate panes (shared with vim-tmux-navigator)
+- `Alt h/j/k/l` — resize panes
+
 ## Claude Code (`claude/` stow module)
 
 The `claude/` stow module symlinks into `~/.claude/` and provides the base Claude Code configuration. Two layers govern behavior:
@@ -193,7 +226,7 @@ Projects extend behavior at the project level (`<project>/.claude/settings.json`
 
 ### settings.json
 
-Default mode is `plan`. Model is `claude-opus-4-6` with `effortLevel: high`, `outputStyle: explanatory`. Shell is set to `/usr/local/bin/bash`.
+Default mode is `default`. Model is `claude-opus-4-6` with `effortLevel: high`, `outputStyle: explanatory`. Shell is set to `/usr/local/bin/bash`.
 
 **Permissions (allowlist):** `tk *`, read-only git (`status`, `diff`, `log`, `show`, `rev-parse`, `remote -v`), bash utilities (`which`, `pwd`, `file`, `wc`, `tree`, `ls`, `stat`), and `cat ~/.claude/references/*`. Everything else requires approval.
 
@@ -208,6 +241,7 @@ Default mode is `plan`. Model is `claude-opus-4-6` with `effortLevel: high`, `ou
 - **`/fix-pr-comments`** — Addresses unresolved PR review comments. User-only (`disable-model-invocation: true`). Tool-sandboxed to `Bash(gh *)` only.
 - **`/plan-to-tk`** — Converts a plan file into actionable tk tickets with dependencies. Accepts plain markdown or `.synth.md` (respects epistemic classifications). Researches codebase via orthogonal `epistemic-explore` agents, decomposes into tickets with verification expectations, establishes dependency graph. Supports collaborative/autonomous supervision modes. Every ticket tagged `planned` and ralph-ready.
 - **`/execute`** — Interactive execution of tk tickets with human approval gates. Dispatches subagents per task using the shared core execution flow, presents results for review. Uses dynamic context injection (`!`tk ready -T planned``) for task selection. Accepts optional task ID argument.
+- **`/tk-triage`** — Audits stalled work: surfaces abandoned and in-progress tickets with timestamps, reads ralph execution logs (`${RALPH_LOG_DIR:-.ralph/runs}/<id>.json`), presents root cause assessment, and offers actions (reopen, close, add context, drop). Dynamic context injects current ticket state and available logs.
 - **`tk`** — Not user-invocable. Canonical reference for tk commands, state machine, and workflow conventions (planned gate, abandoned tag, dependency direction). Loaded automatically when tk-related work comes up.
 - **`epistemic-classification`** — Not user-invocable. Thin wrapper injecting epistemic reference for agents that need V/I/G rigor without PKM.
 - **`epistemic-pkm-research`** — Not user-invocable. Injects epistemic + PKM references with behavioral guidance (ref vs synth selection, qmd duplicate checking, return vs persist modes). Preloaded into `epistemic-explore`.
@@ -224,10 +258,9 @@ Default mode is `plan`. Model is `claude-opus-4-6` with `effortLevel: high`, `ou
 
 ## tk (Task Management)
 
-[tk](https://github.com/wedow/ticket) is a bash-based, git-native task manager with zero dependencies. Installed from `vendor/ticket/` submodule, symlinked to `~/.local/bin/tk`.
+[tk](https://github.com/Nathan-Schwartz/ticket) is a bash-based, git-native task manager with zero dependencies. Installed from `vendor/ticket/` submodule, symlinked to `~/.local/bin/tk`.
 
 - `tk` commands are allow-listed in the base Claude Code settings
-- Custom plugins in `vendor/tk-plugins/`: `ticket-tag`, `ticket-untag`
 
 ## Root .gitignore
 

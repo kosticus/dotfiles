@@ -29,7 +29,7 @@
 # Clone repo and all submodules
 git clone https://github.com/Nathan-Schwartz/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-git submodule update --force --recursive --init --remote
+git submodule update --force --init --remote
 
 # Install stow however you like.
 # The install script (./scripts/install.sh) will install stow but also many other things.
@@ -77,10 +77,10 @@ Removing dependencies is distro specific.
 
 ### Tmux
 
-- Can resurrect tmux sessions
-- Vim inspired key bindings
-- Seamless navigation between vim windows and tmux panes (vim-tmux-navigator)
-- Solarized dark theme to match vim
+- Vi-style keybindings, Solarized dark theme, session resurrection
+- Seamless navigation between vim splits and tmux panes (vim-tmux-navigator)
+- Claude Code integration: per-window status indicators (●/○/?) and an interactive session dashboard
+- Scratch terminal popup and `tmclaude` helper for quick Claude windows
 
 ### Bash
 
@@ -124,6 +124,8 @@ Skills help move along this spectrum. Each transition increases structure and co
 | tickets → code | ralph | autonomous | tk tickets tagged `planned` | committed code |
 
 `/to-pkm` is a general knowledge capture tool which generates files according to my PKM definitions.
+
+`/tk-triage` audits stalled work — surfaces abandoned and in-progress tickets, reads ralph execution logs, classifies failure modes, and helps decide next steps.
 
 #### Personal Knowledge Management (PKM)
 

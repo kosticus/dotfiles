@@ -5,7 +5,6 @@ description: >-
   Researches the codebase to vet the plan, decomposes into tickets,
   verifies the decomposition, and creates tickets in tk.
 argument-hint: <plan-file-path> [autonomous]
-disable-model-invocation: true
 ---
 
 Convert a plan file into actionable tk tickets. The plan file path is provided as `$0`. The supervision level is `$1` — if absent or anything other than "autonomous", default to collaborative mode.
@@ -100,10 +99,13 @@ All agents MUST use epistemic classification (Verified/Inferred/Guess) on their 
 
 Collect agent findings and form an assessment: does the plan hold up?
 
-- **If plan needs amendment**:
-  - `collaborative`: present findings from each lens, discuss with user via `AskUserQuestion`, iterate until the plan is solid
-  - `autonomous`: amend the plan understanding internally based on Verified/Inferred findings (never amend based on Guesses alone) and proceed
 - **If plan holds up**: proceed to decomposition
+- **If plan needs amendment**:
+  - `collaborative`: present findings as a structured review (not a dump of agent output), then iterate with the user until the plan is solid, then proceed to decomposition. The review structure:
+    1. **Organize by severity**: blockers (Verified findings that contradict plan assumptions), concerns (Inferred findings suggesting risk), and informational (context that enriches but doesn't challenge)
+    2. **Group by theme**: related findings presented together so the user sees the full picture. For each group, present the evidence and a recommended resolution — the user may accept, discuss, or ignore the recommendation.
+    3. **Confirm the amended understanding**: after all issues are addressed, summarize how the plan differs from the original. Get explicit confirmation before proceeding to decomposition.
+  - `autonomous`: amend the plan understanding internally based on Verified/Inferred findings (never amend based on Guesses alone). If blockers exist that require human judgment to resolve, trigger contract failure rather than guessing. Proceed to decomposition.
 
 ## Phase 3: Decompose
 
@@ -127,6 +129,8 @@ Break the plan into discrete tk tickets.
 - **Single capability** (most plans): parent is a **feature**, children are **tasks**
 - **Multiple distinct capabilities**: parent is an **epic**, children are **features** — this likely means the plan is too large for one pass, which should trigger the contract failure
 
+Features group tasks by **what they deliver** (a capability, component, or subsystem), not when they execute. If your proposed features map to "Phase 1, Phase 2, Phase 3" or "bug fixes, then features, then enhancements," you've created phases, not features. Restructure so each feature represents a coherent capability.
+
 ### Dependency direction
 
 Children block their parents. Work flows bottom-up:
@@ -141,6 +145,19 @@ Task (do first) ──blocks──► Feature ──blocks──► Epic (comple
 - Between siblings with ordering constraints: `tk dep <downstream_id> <upstream_id>`
 
 This ensures `tk ready` surfaces leaf tasks first — the actual work for ralph to execute.
+
+### Dependency types
+
+There are two kinds of ordering constraints between sibling tasks:
+
+- **Logical**: task B consumes the output/artifact of task A. Fixed order.
+- **Contention**: tasks modify the same file(s) and must be serialized to avoid conflicts, but either could go first. Pick the order that minimizes blocking (e.g., smaller task first to unblock the chain faster).
+
+Both are expressed via `tk dep`. The distinction matters during decomposition — logical deps come from the plan's structure, contention deps come from file-overlap analysis.
+
+### File-contention analysis
+
+After decomposition, map each task to the files it will modify. Tasks that write to the same file(s) MUST be serialized via contention deps. This is a mechanical constraint — even logically independent changes conflict at the file level when executed in parallel sessions.
 
 ### Ticket content
 
@@ -160,6 +177,7 @@ Agent-driven audit of the proposed ticket structure. This always runs regardless
 - **Gaps**: is there work that falls between tickets?
 - **Sizing**: is any ticket too large for a single ralph session? Is any ticket too trivial to be standalone?
 - **Dependencies**: are ordering constraints correct? Check the proposed dependency graph for cycles before any tickets are created.
+- **Parallelism safety**: look at which tasks `tk ready` would surface simultaneously. Do any of them modify the same files? If so, add contention deps.
 - **Clarity**: could ralph (a fresh claude session receiving only the output of `tk show <id>`) execute each ticket without needing additional context?
 
 ### If issues are found
@@ -242,6 +260,17 @@ Always output:
 - Dependency graph / execution order
 - Which tickets `tk ready` surfaces first
 - Source plan file path (`$0`) for provenance
+
+## Phase 7: Next Steps
+
+Do NOT offer to begin implementation. The tickets are the durable handoff artifact.
+
+Direct the user to use the `/execute` skill for interactive ticket implementation or `$ ralph` for autonomous ticket implementation. Note that:
+- `/execute` can be run in a new session — tickets contain all necessary context.
+- `/execute` can be run in multiple parallel sessions, but it is highly recommended to hand-pick tasks for this because:
+    1. parallel tasks that touch the same files will interfere with one another and the commits would not be atomic.
+    2. there is no guarantee that `/execute` won't pick up a task that's in progress in another session.
+- `$ ralph` runs each task with `--permission-mode acceptEdits` (file edits auto-accepted) and `--allowedTools "Bash(git add *),Bash(git commit *)"` (only git add and git commit). It inherits both global and project-level `settings.json` permissions — so if a project allowlists the tools its tasks need (e.g., test runners, build commands), ralph can execute them. Tasks that need tools not covered by any settings.json allowlist or ralph's `--allowedTools` will fail because the non-interactive agent cannot request permission.
 
 ## Examples
 
