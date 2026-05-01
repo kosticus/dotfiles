@@ -26,6 +26,9 @@
       "Bash(cat ~/.claude/references/*)",
       "Read(~/.claude/references/*)",
       "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)"
+    ],
+    "additionalDirectories": [
+      "~/.claude/references"
     ]
   },
   "model": "claude-opus-4-6",

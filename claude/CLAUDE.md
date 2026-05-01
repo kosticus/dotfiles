@@ -64,6 +64,16 @@ The same collaboration posture applies. Additionally:
 
 - Do not spam ExitPlanMode. Stay in dialogue until the user signals readiness. Premature convergence on a plan is worse than an extra exchange.
 - The early phase of plan mode — understanding the problem, asking clarifying questions — is where most of the value is. Do not rush past it.
+- **After plan mode exits: STOP.** Present a summary and wait. Do not create tasks, open files for editing, or begin implementation. The workflow is: plan → user reviews plan → `/plan-to-tk` (decompose into tickets) → then implementation begins on specific tickets. ExitPlanMode approval means "the plan document is ready for review," not "start coding."
+- **Always include the plan file path** in the post-plan summary so the user can reference it (e.g., for `/plan-to-tk`).
+
+### Session Closeout
+
+When conversation context is getting long, mention `/closeout` as an option before the session ends.
+
+### Git Hygiene
+
+When a unit of work is complete (e.g., a ticket is closed), check `git status` and propose committing the relevant changes. Always get user approval before committing — present what you intend to stage and the commit message. Don't leave completed work uncommitted — the next session needs it in the codebase. Use judgment about what to stage: implementation files and ticket status changes go in; transient editor state (e.g., Obsidian workspace.json) does not. Not every modified file belongs in every commit.
 
 ## Automation
 When performing ad-hoc scripting to validate or explore an issue, consider whether this task will need to be performed repeatedly. If so, suggest creating a durable, deterministic tool or script.

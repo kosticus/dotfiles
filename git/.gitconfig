@@ -50,3 +50,8 @@
 # Local settings and overrides
 [include]
   path = ~/.gitconfig.local
+[user]
+	name = Kimberly Kost
+	email = kek2009@gmail.com
+[pull]
+	ff = only

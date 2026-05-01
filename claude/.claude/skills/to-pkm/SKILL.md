@@ -17,12 +17,15 @@ Convert the current conversation into atomic PKM artifacts with compound extensi
 
 The target directory is: $ARGUMENTS
 
-Default: `~/pkm/projects/`
+If `$ARGUMENTS` is empty or omitted, derive the default from the current git repository:
+1. Get the repo name: the basename of the git toplevel directory (e.g., `sosfomt`, `obra-dinn-tracker`).
+2. Default target: `~/pkm/projects/<repo-name>/`.
+3. If not inside a git repo, fall back to requiring an explicit argument — abort with: "Not in a git repo. Specify a target directory: `/to-pkm <name-or-path>`"
 
-If `$ARGUMENTS` is empty or omitted, use the default. Resolve the directory:
+Resolve the directory (whether from argument or default):
 - If it exists as an absolute path or relative to the current directory, use it directly.
 - If not found, check `~/pkm/projects/$ARGUMENTS`.
-- If still not found, abort with an error listing the paths that were checked.
+- If still not found, prompt the user: "Directory `~/pkm/projects/<name>/` does not exist. Create it?" — abort if they decline, `mkdir -p` and continue if they confirm.
 
 ## 2. Analyze conversation with ref bias
 

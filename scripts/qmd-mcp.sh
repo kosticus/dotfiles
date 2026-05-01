@@ -18,4 +18,11 @@ if command -v mise &>/dev/null; then
   eval "$(mise activate bash)"
 fi
 
+# n version manager — must come AFTER Homebrew so n's Node takes precedence
+# (qmd's native modules are compiled against n's Node, not Homebrew's)
+if [ -d "$HOME/n/bin" ]; then
+  export PATH="$HOME/n/bin:$PATH"
+fi
+
+export NODE_OPTIONS="--no-warnings"
 exec qmd mcp
