@@ -1,6 +1,8 @@
-font-family = Menlo
+font-family = Monaco
 font-size = 14
-theme = iTerm2 Solarized Dark
+# theme = iTerm2 Solarized Dark
+theme = TokyoNight Night 
+
 cursor-style = block
 cursor-style-blink = false
 scrollback-limit = 1000
