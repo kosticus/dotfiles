@@ -39,7 +39,7 @@
           {
             "type": "command",
             "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
-            "if": "Write(**/*.{temp,index,ref,synth}.md)|Edit(**/*.{temp,index,ref,synth}.md)"
+            "if": "Write(**/*.ref.md)|Write(**/*.synth.md)|Write(**/*.temp.md)|Write(**/*.index.md)|Edit(**/*.ref.md)|Edit(**/*.synth.md)|Edit(**/*.temp.md)|Edit(**/*.index.md)"
           }
         ]
       }
