@@ -36,7 +36,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook"
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Write(**/*.{temp,index,ref,synth}.md)|Edit(**/*.{temp,index,ref,synth}.md)"
           }
         ]
       }
