@@ -38,7 +38,13 @@ git submodule update --force --init --remote
 stow vim bash git ghostty mise tmux claude
 ```
 
-2. To identify yourself with git, create a `~/.gitconfig.local` with the following structure:
+2. To configure Ghostty to use Homebrew bash as the default shell:
+
+```bash
+chsh -s $(which bash)
+```
+
+3. To identify yourself with git, create a `~/.gitconfig.local` with the following structure:
 
 ```
 [user]
