@@ -204,6 +204,7 @@ let g:ale_fixers = {
   \ 'graphql': ['prettier'],
   \ 'css': ['prettier'],
   \ 'json': ['prettier'],
+  \ 'elixir': ['mix_format'],
   \ '*': ['remove_trailing_lines', 'trim_whitespace']
   \ }
 let g:ale_linters = {
@@ -211,7 +212,8 @@ let g:ale_linters = {
   \ 'javascript': ['biome'],
   \ 'javascriptreact': ['biome'],
   \ 'typescript': ['biome'],
-  \ 'typescriptreact': ['biome']
+  \ 'typescriptreact': ['biome'],
+  \ 'elixir': ['elixir-ls']
   \ }
 let g:ale_yaml_yamllint_options='-d "{extends: relaxed, rules: {line-length: disable}}"'
 

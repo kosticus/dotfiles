@@ -1,3 +1,6 @@
+[submodule ".vim/elixir-ls"]
+	path = .vim/elixir-ls
+	url = https://github.com/elixir-lsp/elixir-ls.git
 [submodule ".vim/vim-colors-solarized"]
 	path = vim/.vim/bundle/vim-colors-solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
