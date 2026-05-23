@@ -21,6 +21,7 @@ function main() {
   mise_installs
   python_installs
   upgrade_dependencies
+  sync_pkm_collections
   log "Good to go!"
 }
 
@@ -197,6 +198,19 @@ function upgrade_dependencies() {
     fi
     cd -
   fi
+}
+
+function sync_pkm_collections() {
+  # Discover pkm/ folders under $HOME and register them as qmd collections.
+  # Skipped in CI (no user notes; qmd embed needs API credentials we don't ship).
+  if [ "${CI:-false}" != false ]; then
+    return
+  fi
+  if ! command_exists qmd; then
+    return
+  fi
+  log "Syncing qmd PKM collections under \$HOME"
+  bash "$DOTFILES_DIR/scripts/qmd-sync.sh" --discover "$HOME"
 }
 
 function log() {

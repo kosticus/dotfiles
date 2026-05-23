@@ -35,7 +35,7 @@ When the type is genuinely ambiguous, ask the user — don't guess.
 
 ## 3. Present manifest
 
-If qmd MCP tools are available and the target directory is a registered qmd collection, search for semantically related existing files using `qmd_search` or `qmd_deep_search`. Include matches in the manifest as a separate "possibly related" tier (distinct from the certain cross-references between files created in the same invocation).
+If `qmd` is available and the target directory is a registered qmd collection, search for semantically related existing files using `qmd query <concept> -c <collection>` (hybrid lex+vec+rerank). Include matches in the manifest as a separate "possibly related" tier (distinct from the certain cross-references between files created in the same invocation).
 
 Present a numbered list inline in the conversation. Each item shows:
 

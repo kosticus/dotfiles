@@ -50,12 +50,12 @@ The test: if someone deleted the source URLs, would the ref still contain useful
 
 ## Duplicate Checking
 
-This may be skipped if qmd is inaccessible via mcp, but you must check.
+This may be skipped if `qmd` is not on PATH, but you must check.
 
 Before writing any `.ref.md`, search qmd for semantically similar existing files:
 
-1. Use `qmd_search` with a lexical query matching the key terms
-2. Use `qmd_search` with a semantic query matching the concept
+1. Use `qmd search <key terms>` for a lexical (BM25) match
+2. Use `qmd query <concept>` for a hybrid semantic match (lex + vec + rerank)
 3. If near-duplicates exist (score > 0.7), report them instead of creating redundant files
 4. If partial overlap, reference the existing file and write only the new facts
 

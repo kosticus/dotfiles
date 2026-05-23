@@ -25,7 +25,8 @@
       "Bash(stat *)",
       "Bash(cat ~/.claude/references/*)",
       "Read(~/.claude/references/*)",
-      "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)"
+      "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)",
+      "Bash(qmd *)"
     ],
     "defaultMode": "default"
   },
@@ -51,14 +52,5 @@
   },
   "outputStyle": "explanatory",
   "effortLevel": "high",
-  "mcpServers": {
-    "qmd": {
-      "command": "bash",
-      "args": [
-        "-c",
-        "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/qmd-mcp.sh"
-      ]
-    }
-  },
   "editorMode": "vim"
 }
