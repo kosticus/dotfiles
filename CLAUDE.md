@@ -247,7 +247,7 @@ Default mode is `default`. Model is `claude-opus-4-6` with `effortLevel: high`, 
 
 ### Agents
 
-- **`epistemic-explore`** — Research subagent with enforced epistemic classification. Tools: Read, Grep, Glob, Bash, Write, Edit. Has qmd MCP access. Output must use V/I/G tiers plus a mandatory "Not Checked" section. Two modes: return findings to caller (default) or persist as `.ref.md` artifacts when instructed.
+- **`epistemic-explore`** — Research subagent with enforced epistemic classification. Tools: Read, Grep, Glob, Bash, Write, Edit (qmd via CLI, no MCP). Output must use V/I/G tiers plus a mandatory "Not Checked" section. Always writes findings to disk and returns both summary and path. Default destination: `<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/<topic-slug>/*.ref.md` (creates `.claude/` if absent; falls back to `$PWD` outside git repos). Explicit destination overrides the default when the delegation specifies one. Scratch is session-scoped; promotion to durable PKM is a manual `mv` into a project's `pkm/` dir followed by `qmd update`.
 
 ### Reference Docs
 

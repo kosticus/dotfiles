@@ -69,6 +69,19 @@ The same collaboration posture applies. Additionally:
 When performing ad-hoc scripting to validate or explore an issue, consider whether this task will need to be performed repeatedly. If so, suggest creating a durable, deterministic tool or script.
 Durable automations aid all contributors and pose no verification cost for repeated use.
 
+## Research Subagent
+
+The `epistemic-explore` agent always writes findings to disk and returns both a summary and the path. By default, files land in:
+
+`<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/<topic-slug>/`
+
+Treat the returned path as a re-readable artifact:
+
+- **Follow-up exploration**: re-read scratch (`Read`, `qmd get`) rather than re-delegating — you get the full classified findings, not just the summary.
+- **Scope**: scratch is session-scoped. Cross-session follow-up needs the path passed explicitly.
+- **Promotion**: when findings prove durable, `mv` into a project's `pkm/` directory and run `qmd update` (the validation hook fires on `Write|Edit`, not `Bash`, so a manual `mv` bypasses reindex).
+- **Explicit destination**: to write directly to a permanent location, specify the target in the delegation prompt.
+
 ## PKM
 
 Files with compound extensions (`.ref.md`, `.synth.md`, `.temp.md`, `.index.md`) are knowledge base artifacts with enforced frontmatter schemas.
