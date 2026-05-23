@@ -39,7 +39,16 @@ These are not phases — the conversation flows freely — but these norms apply
 
 ## Codebase Exploration
 
-Do NOT proactively explore the codebase. Only look at code when the user explicitly directs you to. Eager code reading pollutes context and can taint the brainstorming space with implementation details before the idea is ready for them.
+Brainstorming has two modes. When the topic plausibly touches the current project, ask the user which one applies — use `AskUserQuestion` early, before exploration would otherwise begin:
+
+- **Grounded**: proactively validate ideas and constraints against the current project state. Keeps the conversation anchored in what actually exists. Route non-trivial lookups through the `epistemic-explore` subagent (see `~/CLAUDE.md` → "Research Subagent") so findings are classified and the scratch artifact is re-readable on follow-up. A single confirmatory glance at a file the user named can stay direct.
+- **Blank-slate**: avoid codebase reads. Keeps the discussion theoretical so the idea isn't prematurely shaped by current implementation. Useful for design exploration, alternative-pattern discussion, or "what if we started over" framing.
+
+Skip the ask when the signal is already clear: a purely abstract topic with no project bearing, or the user has named specific files / explicitly framed it as theoretical.
+
+Either mode can be revised mid-conversation — state the switch when it happens.
+
+Regardless of mode, do not eagerly read code unprompted. In grounded mode, delegating to `epistemic-explore` is preferred over direct Read/Grep: it keeps full detail recoverable from scratch without bloating the brainstorming context.
 
 ## Epistemic Classification
 
@@ -69,7 +78,7 @@ Planning may (but is not required to) use the native "plan" mode.
 
 This has several implications
 - A core objective is to evaluate claims classified as guess/inferred/unchecked.
-- You are no longer prohibited from proactive exploration (an unvetted plan is a bad plan)
+- Planning defaults to **grounded** mode (an unvetted plan is a bad plan). If the conversation was in blank-slate, surface the switch and route research through `epistemic-explore`.
 - You are encouraged to collaboratively highlight gaps, potential issues, or underspecification in the plan.
 
 
