@@ -33,17 +33,25 @@ When the type is genuinely ambiguous, ask the user — don't guess.
 
 **Atomicity**: One idea per file. Prefer fewer substantial files over many tiny ones — three related facts in one ref beats three single-fact refs. A ref that captures a tool's capabilities, tradeoffs, and CLI in one document is better than three separate files.
 
-## 3. Present manifest
+## 3. Discover and present manifest
+
+Before assembling the manifest, discover any epistemic-explore research docs produced earlier in this session using `ls` only — do not read the file contents:
+
+`<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/`
+
+where `<project-root>` is `git rev-parse --show-toplevel` (or `$PWD` if not in a git repo). Each subdirectory is a topic slug. Reconciliation (step 6) is the only step that reads these files.
 
 If `qmd` is available and the target directory is a registered qmd collection, search for semantically related existing files using `qmd query <concept> -c <collection>` (hybrid lex+vec+rerank). Include matches in the manifest as a separate "possibly related" tier (distinct from the certain cross-references between files created in the same invocation).
 
-Present a numbered list inline in the conversation. Each item shows:
+Present a numbered list inline in the conversation. Each conversation-derived item shows:
 
 - Type tag: `[ref]`, `[synth]`, `[temp]`
 - Proposed filename (kebab-case with compound extension)
 - One-line summary
 - Topics
 - `sources:` (refs, URLs, files, or notes the content derives from — includes cross-references to other proposed files)
+
+After the conversation items, list the discovered research docs as a separate section using their topic-slug directory names only (no file count, no content peek). The session-id wrapper is omitted both in the UI and in the copy destination — only the topic-slug folder lands in the target.
 
 Example format:
 
@@ -64,13 +72,19 @@ PROPOSED FILES (confirm/drop/reclassify):
    summary: "Does /scratch serve a purpose now that .temp.md exists?"
    topics: [progressive-formalization]
 
+EPISTEMIC-EXPLORE RESEARCH DOCS (from this session, copied as-is):
+- topic-foo/
+- topic-bar/
+
 Reply with any changes, or confirm to write all. Examples:
-  "drop 3" / "2 → ref" / "looks good" / "drop 1, rest is fine"
+  "drop 3" / "2 → ref" / "drop topic-bar" / "looks good"
 ```
 
 **Stop and wait for the user's response.** Do not write any files until confirmation.
 
-## 4. Write confirmed files
+## 4. Write confirmed conversation files
+
+Write the conversation-derived files first — these capture content that disappears if context runs out. The copied research docs and reconciliation can wait.
 
 For each confirmed item, write the file to the target directory. Use the required and optional frontmatter fields from the schema reference above for each type.
 
@@ -80,7 +94,27 @@ Include cross-references to other files created in this invocation in the `sourc
 
 **Inline citations**: Every entry in a file's frontmatter `sources:` must appear as an inline markdown link (`[text](path)`) in the body. The link anchors the source to the specific content it supports — a claim, a section, or an argument. No phantom sources (listed in frontmatter but never linked in the body). Citation granularity can vary — per-claim, per-section, per-argument — as long as the connection between source and content is clear.
 
-## 5. Generate session index
+## 5. Copy epistemic-explore research docs
+
+For each confirmed research doc folder, copy it into the target directory using `cp -r`. The session-id wrapper from the scratch path is dropped — only the topic-slug folder lands in the destination.
+
+Source: `<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/<topic-slug>/`
+Destination: `<target>/<topic-slug>/`
+
+If a destination path already exists, prompt the user before overwriting.
+
+`cp` bypasses the PostToolUse hook, so reindexing waits for step 8.
+
+## 6. Reconciliation
+
+This is the first step that reads the files written in step 4 and the research docs copied in step 5. Goals:
+
+1. **Cross-link related files.** Identify topical overlap between conversation files and copied research docs, and add reciprocal `sources:` entries plus inline body links. Every added `sources:` entry must appear as an inline markdown link in the body — no phantom sources.
+2. **Flag substantive discrepancies.** If a conversation file and a research doc make contradictory claims on the same topic, surface the contradiction for the user. Do not silently resolve.
+
+Hybrid posture: apply mechanical cross-links directly, gate contradictions on user input.
+
+## 7. Generate session index
 
 Write a session index file to the target directory:
 
@@ -89,32 +123,32 @@ Filename: `session-YYYY-MM-DD-HHMM.index.md`
 ```yaml
 ---
 summary: "<one-line session summary>"
-topics: [<union of all created file topics>]
-sources: [<list of all files created in this session>]
+topics: [<union of all created and copied file topics>]
+sources: [<all conversation files written + all research doc folders copied>]
 generated: true
 created: "<ISO-8601 datetime>"
 ---
 ```
 
-Body: categorized list of all created files with their summaries, grouped by type (Refs, Synths, Temp).
+Body: categorized list grouped by origin — conversation files (subgrouped by Refs/Synths/Temp) and epistemic-explore research docs (by topic).
 
-## 6. Update search index
+## 8. Update search index
 
-After all files are written, update vector embeddings so semantic search can find the new content:
+After all writes, copies, and reconciliation edits are done, refresh both indices:
 
-```
-qmd embed
-```
+1. `qmd update` — rebuilds the keyword index. Required because `cp` (step 5) bypasses the PostToolUse hook that normally keeps the keyword index current.
+2. `qmd embed` — generates vector embeddings for semantic search.
 
-The PostToolUse hook keeps the keyword index current automatically, but vector embeddings require this explicit step.
+The PostToolUse hook keeps the keyword index current automatically for `Write|Edit` (including reconciliation edits), but `cp` flows through Bash, so the explicit `qmd update` is needed.
 
 ## Rules
 
 - **Never write files before manifest confirmation.**
-- **Never edit existing files** in the target directory.
+- **Never edit pre-existing files** in the target directory (those that existed before this invocation). Reconciliation (step 6) may edit files written or copied during this invocation to add cross-links.
 - Every file gets `generated: true` — nothing claims to be human-reviewed.
 - Ref bias means actively decomposing reasoning to extract embedded facts. When the type is genuinely ambiguous, ask.
 - Atomicity: one idea per file. But "one idea" means one coherent topic, not one sentence.
 - Filenames: kebab-case with compound extension (`.ref.md`, `.synth.md`, `.temp.md`). Descriptive but concise.
 - If the conversation produced nothing worth capturing, say so and stop. Don't manufacture content.
+- **Do not read epistemic-explore research doc contents before step 6 (reconciliation).** Steps 3-5 use the file tree only (`ls`, `cp`); reading is deferred to keep context lean and preserve urgency-first ordering. If context runs out before step 6, the data files are all on disk and the user can re-run for the remaining steps.
 - **qmd indexing**: A PostToolUse hook automatically updates the qmd keyword index for existing collections. If the target directory is not yet a qmd collection, remind the user to run `qmd-sync.sh <dir>` to register it.
