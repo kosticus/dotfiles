@@ -85,7 +85,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/kimberlykost/.claude/statusline-command.sh",
+    "command": "~/.claude/statusline.sh",
     "padding": 0
   },
   "outputStyle": "explanatory",
