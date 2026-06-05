@@ -25,13 +25,15 @@
       "Bash(stat *)",
       "Bash(cat ~/.claude/references/*)",
       "Read(~/.claude/references/*)",
-      "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)"
+      "Bash(bash ~/dotfiles/scripts/tk-triage-context.sh *)",
+      "Bash(qmd *)"
     ],
+    "defaultMode": "default",
     "additionalDirectories": [
       "~/.claude/references"
     ]
   },
-  "model": "claude-opus-4-6",
+  "model": "claude-opus-4-7",
   "hooks": {
     "PostToolUse": [
       {
@@ -39,7 +41,43 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook"
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Write(**/*.ref.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Write(**/*.synth.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Write(**/*.temp.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Write(**/*.index.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Edit(**/*.ref.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Edit(**/*.synth.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Edit(**/*.temp.md)"
+          },
+          {
+            "type": "command",
+            "command": "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/pkm-integrity-hook.sh --post-hook",
+            "if": "Edit(**/*.index.md)"
           }
         ]
       }
@@ -47,19 +85,12 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/kimberlykost/.claude/statusline-command.sh"
+    "command": "bash /Users/kimberlykost/.claude/statusline-command.sh",
+    "padding": 0
   },
   "outputStyle": "explanatory",
   "syntaxHighlightingDisabled": false,
   "effortLevel": "high",
-  "mcpServers": {
-    "qmd": {
-      "command": "bash",
-      "args": [
-        "-c",
-        "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/qmd-mcp.sh"
-      ]
-    }
-  },
+  "editorMode": "vim",
   "autoCompactEnabled": false
 }

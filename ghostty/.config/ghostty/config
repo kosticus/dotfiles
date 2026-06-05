@@ -5,7 +5,7 @@ theme = TokyoNight Night
 
 cursor-style = block
 cursor-style-blink = false
-scrollback-limit = 1000
+scrollback-limit = 1000000000
 background-opacity = 1
 confirm-close-surface = false
 macos-option-as-alt = true

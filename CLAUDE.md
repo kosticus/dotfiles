@@ -19,7 +19,7 @@ New vim plugins must be added as git submodules under `vim/.vim/bundle/` and are
 
 ### Key Files
 
-- `scripts/install.sh` — Idempotent install script (brew/apt/yum + mise + python + dependency upgrades)
+- `scripts/install.sh` — Idempotent install script (brew/apt/yum + mise + python + dependency upgrades + qmd PKM collection sync)
 - `mise/.tool-versions` — Pinned versions for mise-managed dev tools
 - `test.sh` — Linters and assertions (yamllint, proselint, vint, shellcheck, jq)
 - `.github/workflows/ci.yml` — GitHub Actions CI (ubuntu + rocky linux + mac)
@@ -27,7 +27,6 @@ New vim plugins must be added as git submodules under `vim/.vim/bundle/` and are
 - `bash/.bash/functions.sh` — Shared helpers (`command_exists`, `missing_command`, `assert`)
 - `scripts/pkm-integrity-hook.sh` — PostToolUse hook: validates frontmatter schemas, triggers qmd index updates
 - `scripts/qmd-sync.sh` — Discovers PKM directories and registers them as qmd collections
-- `scripts/qmd-mcp.sh` — Wrapper that launches `qmd mcp` for the Claude MCP server integration
 - `scripts/generate-mocs.py` — Generates Maps of Content (`.index.md`) for PKM directories
 - `bash/.bash/ralph.sh` — Ralph autonomous executor (task-per-session loop backed by tk + claude CLI)
 - `tmux/.tmux/scripts/claude-status.sh` — Detects Claude Code state (working/waiting/idle) in a tmux pane
@@ -228,11 +227,11 @@ Projects extend behavior at the project level (`<project>/.claude/settings.json`
 
 Default mode is `default`. Model is `claude-opus-4-6` with `effortLevel: high`, `outputStyle: explanatory`. Shell is set to `/usr/local/bin/bash`.
 
-**Permissions (allowlist):** `tk *`, read-only git (`status`, `diff`, `log`, `show`, `rev-parse`, `remote -v`), bash utilities (`which`, `pwd`, `file`, `wc`, `tree`, `ls`, `stat`), and `cat ~/.claude/references/*`. Everything else requires approval.
+**Permissions (allowlist):** `tk *`, `qmd *` (CLI search/get/status), read-only git (`status`, `diff`, `log`, `show`, `rev-parse`, `remote -v`), bash utilities (`which`, `pwd`, `file`, `wc`, `tree`, `ls`, `stat`), and `cat ~/.claude/references/*`. Everything else requires approval.
 
 **PostToolUse hook:** Every `Write|Edit` runs `pkm-integrity-hook.sh` which validates PKM frontmatter schemas and updates the qmd keyword index for compound-extension files.
 
-**MCP server:** qmd (via `scripts/qmd-mcp.sh`) provides semantic and keyword search across PKM collections.
+**Semantic search:** qmd is invoked via its CLI directly (no MCP server) — keeps it portable to environments with locked-down MCP server policies.
 
 ### Skills
 
@@ -248,7 +247,7 @@ Default mode is `default`. Model is `claude-opus-4-6` with `effortLevel: high`, 
 
 ### Agents
 
-- **`epistemic-explore`** — Research subagent with enforced epistemic classification. Tools: Read, Grep, Glob, Bash, Write, Edit. Has qmd MCP access. Output must use V/I/G tiers plus a mandatory "Not Checked" section. Two modes: return findings to caller (default) or persist as `.ref.md` artifacts when instructed.
+- **`epistemic-explore`** — Research subagent with enforced epistemic classification. Tools: Read, Grep, Glob, Bash, Write, Edit (qmd via CLI, no MCP). Output must use V/I/G tiers plus a mandatory "Not Checked" section. Always writes findings to disk and returns both summary and path. Default destination: `<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/<topic-slug>/*.ref.md` (creates `.claude/` if absent; falls back to `$PWD` outside git repos). Explicit destination overrides the default when the delegation specifies one. Scratch is session-scoped; promotion to durable PKM is a manual `mv` into a project's `pkm/` dir followed by `qmd update`.
 
 ### Reference Docs
 

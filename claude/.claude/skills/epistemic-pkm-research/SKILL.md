@@ -14,14 +14,17 @@ This skill provides behavioral guidance for producing epistemically classified P
 
 !`cat ~/.claude/references/pkm-schema-reference.md`
 
-## When to Write vs. When to Return
+## Output Destination
 
-This is controlled by the delegation prompt from the main conversation:
+Every invocation writes findings to disk and returns the path alongside the summary.
 
-- **Return mode** (default): Return epistemically classified findings as structured text. Do not write files.
-- **Persist mode**: When the delegation mentions persisting/saving, write `.ref.md` files directly.
+- **Default (no destination specified)**: Write to `<project-root>/.claude/scratch/epistemic-explore/$CLAUDE_CODE_SESSION_ID/<topic-slug>/`.
+  - Project root: `git rev-parse --show-toplevel` if inside a git repo; otherwise `$PWD`.
+  - Create intermediate directories as needed (`mkdir -p`).
+  - Topic slug: derive from the delegation prompt, ≤50 chars, kebab-case. One folder per invocation.
+- **Explicit destination**: When the delegation specifies a target directory (or mentions "persist"/"save" with one), write there instead.
 
-If a target folder is not specified, write it to the repo's root if it is a git repo, or the working directory otherwise.
+Scratch artifacts are durable within the session. Follow-up exploration should re-read scratch files rather than re-running the research. Scratch files can be promoted to permanent PKM by manually moving them into a project's `pkm/` directory (run `qmd update` afterward to refresh the index — the hook fires on `Write|Edit`, not `Bash`).
 
 ## Choosing Between Types
 
@@ -50,12 +53,12 @@ The test: if someone deleted the source URLs, would the ref still contain useful
 
 ## Duplicate Checking
 
-This may be skipped if qmd is inaccessible via mcp, but you must check.
+This may be skipped if `qmd` is not on PATH, but you must check.
 
 Before writing any `.ref.md`, search qmd for semantically similar existing files:
 
-1. Use `qmd_search` with a lexical query matching the key terms
-2. Use `qmd_search` with a semantic query matching the concept
+1. Use `qmd search <key terms>` for a lexical (BM25) match
+2. Use `qmd query <concept>` for a hybrid semantic match (lex + vec + rerank)
 3. If near-duplicates exist (score > 0.7), report them instead of creating redundant files
 4. If partial overlap, reference the existing file and write only the new facts
 
