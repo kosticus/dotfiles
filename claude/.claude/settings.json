@@ -60,5 +60,6 @@
         "${DOTFILES_DIR:-$HOME/dotfiles}/scripts/qmd-mcp.sh"
       ]
     }
-  }
+  },
+  "autoCompactEnabled": false
 }
